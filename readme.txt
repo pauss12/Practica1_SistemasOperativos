@@ -1,3 +1,3 @@
-nombre 1
+Proyecto realizado por Marina Garcia y Paula Méndez 
 
-nombre2
+Practica 1. Sistemas Operativos
