@@ -49,7 +49,16 @@ int cambioHexadecimalADecimal(int variable1, int variable2){
 	return 0;
 }
 
-
+void LimpiaCACHE(T_LINEA_CACHE tbl[NUM_FILAS]){ 
+    
+    for(int i=0; i<NUM_FILAS; i++){
+    	tbl[i].ETQ= 0xFF;
+    	for(int j=0; j<TAM_LINEA;j++){
+    		tbl[i].Datos[j]= 0x23F;
+		}
+	}
+    
+}
 void VuelcaCACHE(T_LINEA_CACHE *tbl){
 	
 	for(int i=0;i<NUM_FILAS; i++){
