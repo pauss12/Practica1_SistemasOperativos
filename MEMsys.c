@@ -8,13 +8,13 @@
 #include <time.h>
 #include <unistd.h>
 
-//CREAMOS LOS DEFINE ----------------------------------------------------------------------------------------------------------------
+//CREAMOS LOS DEFINE -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #define NUM_FILAS 8
 #define MAX_LINEA 100
 #define TAM_LINEA 8
 #define LRAM 1024
 
-//ESTRUCTURA ----------------------------------------------------------------------------------------------------------------
+//ESTRUCTURA ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 typedef struct {
 	
 	unsigned short int ETQ;
@@ -22,34 +22,61 @@ typedef struct {
 	
 }T_LINEA_CACHE;
 
-//PROTOTIPOS DE LAS FUNCIONES ----------------------------------------------------------------------------------------------------------------
+//PROTOTIPOS DE LAS FUNCIONES -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void LimpiaCACHE(T_LINEA_CACHE tbl[NUM_FILAS]);
 void VuelcaCACHE(T_LINEA_CACHE *tbl);
 void Parseaaddr(unsigned int addr, int *ETQ, int *palabra, int *linea, int *bloque);
 void TrataFallo(T_LINEA_CACHE *tbl, char *MRAM, int ETQ, int linea, int bloque);
 int cambioHexadecimalADecimal(long long numero );
 
-//VARIABLES GLOBALES ----------------------------------------------------------------------------------------------------------------
+int escritura_en_fichero_binario();
+void leerBinario();
+int lectura_del_fichero_de_memoria();
+void leer_fichero();
+
+//VARIABLES GLOBALES -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	int globaltime = 0;
 	int numfallos = 0;
 	unsigned char Simul_RAM[4096];
+	T_LINEA_CACHE linea_cache[NUM_FILAS];
+	int numeroAccesosTotales = 0;
+	char fichero_texto[100];
 
-//MAIN ----------------------------------------------------------------------------------------------------------------
+//MAIN ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[]){
 	
-	//Crear las variables
-	T_LINEA_CACHE linea_cache[NUM_FILAS];
+	//LLAMAR A LAS FUNCIONES
 	
-	int variable1 = 0xFF;
-	int variable2 = 0x23;
+	//limpiamos la cache
+	LimpiaCACHE(linea_cache);
 	
-	//Llamar a las funciones
+	//Leemos el fichero Binario
+	leer_fichero();
+	
+	//Lectura fichero de memoria
+	lectura_del_fichero_de_memoria();
+	
+	//Mostrar la tabla
 	VuelcaCACHE(linea_cache);
+	
+	printf("\n");
+	
+	//Mostrar los resultados
+	printf("Accesos totales: %d; Fallos: %d; Tiempo medio: %f ", numeroAccesosTotales, numfallos, (double)clock()/1000);
+	
+	printf("\n");
+	
+	//Muestra el texto
+	printf("Texto leido: %s",fichero_texto);
+    printf("\n");
+	
+    //Escribimos archvo binario
+    escritura_en_fichero_binario();
 	
 	return 0;
 }
 
-//FUNCION CAMBIAR DE HEXADECIMAL A DECIMAL
+//FUNCION CAMBIAR DE HEXADECIMAL A DECIMAL --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int cambioHexadecimalADecimal(long long numero ){
 	
 	//Variables
@@ -67,6 +94,7 @@ int cambioHexadecimalADecimal(long long numero ){
 	return numero_devuelto;
 }
 
+//FUNCION LIMPIAR CACHE ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void LimpiaCACHE(T_LINEA_CACHE tbl[NUM_FILAS]){ 
     
     for(int i=0; i<NUM_FILAS; i++){
@@ -77,6 +105,8 @@ void LimpiaCACHE(T_LINEA_CACHE tbl[NUM_FILAS]){
 	}
     
 }
+
+//FUNCION VOLCAR CACHE ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void VuelcaCACHE(T_LINEA_CACHE *tbl){
 	
 	for(int i=0;i<NUM_FILAS; i++){
@@ -87,4 +117,32 @@ void VuelcaCACHE(T_LINEA_CACHE *tbl){
 		}
 		printf("\n");
 	}
+}
+
+//LEER FICHERO ---------------------------------------------------------------------------------------------------------------------------
+void leerBinario(){
+	
+	FILE * fichero;
+    char buffer[256];
+
+    fichero = fopen ("CONTENS_CACHE.bin", "rb");
+
+    if(fichero != NULL){
+
+        fread(buffer,sizeof(buffer),1,fichero);
+
+        for(int i = 0; i<256; i++){
+            printf("%c",buffer[i]);// prints a series of bytes %u para numeros
+        }
+
+    }else{
+        printf("El archivo seleccionado NO EXISTE\n");
+        exit(-1);
+    }
+}
+
+//ESCRIBIR EN FICHERO
+int escritura_en_fichero_binario(){
+	
+	
 }
