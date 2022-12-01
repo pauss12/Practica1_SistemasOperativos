@@ -189,6 +189,77 @@ bool comparar_etiqueta(int etiqueta, int linea){
     }
 }
 
+// FUNCION CONVERSION A BINARIO
+
+int *convertirBinario(int *Dir_acortada, char linea []){
+    char num_binario[100];
+    num_binario[0]='\0'; //poner el string a 0 y borrar lo que tenia dentro
+
+    for (int i = 0; i < 3; ++i){   
+        if(isdigit(linea[i])){
+            switch(linea[i]){
+                case '0' :       
+                    strcat(num_binario,"0000");
+                    break;
+                case '1' :
+                    strcat(num_binario, "0001");
+                    break;
+                case '2' :
+                    strcat(num_binario, "0010");
+                    break;
+                case '3' :
+                    strcat(num_binario, "0011");
+                    break;
+                case '4' :
+                    strcat(num_binario, "0100");
+                    break;
+                case '5' :
+                    strcat(num_binario, "0101");
+                    break;
+                case '6' :
+                    strcat(num_binario, "0110");
+                    break;
+                case '7' :
+                    strcat(num_binario, "0111");
+                    break;
+                case '8' :
+                    strcat(num_binario, "1000");
+                    break;
+                case '9' :
+                    strcat(num_binario, "1001");
+                    break;
+                default : printf("\n el valor no entra en los rangos  %c",linea[i]);
+		    }
+        }else{
+            switch(linea[i]){
+                case 'A' :
+                    strcat(num_binario, "1010");
+                    break;
+                case 'B' :
+                    strcat(num_binario, "1011");
+                    break;
+                case 'C' :
+                    strcat(num_binario, "1100");
+                    break;
+                case 'D' :
+                    strcat(num_binario, "1101");
+                    break;
+                case 'E' :
+                    strcat(num_binario, "1110");
+                    break;
+                case 'F' :
+                    strcat(num_binario, "1111");
+                    break;
+                default : printf("\n el valor no entra en los rangos %c",linea[i]);
+		    }
+        }              
+    }
+
+    // ahora toca parsear la direccion
+    parsearDireccion(num_binario,Dir_acortada);
+
+    return Dir_acortada;
+}
 
 //ESCRIBIR EN FICHERO ------------------------------------------------------------------------------------------------------
 int escritura_en_fichero_binario(){
