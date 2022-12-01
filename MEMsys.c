@@ -258,5 +258,3 @@ int lectura_del_fichero_de_memoria(){
     }
     return 0;
 }
-
-
