@@ -118,6 +118,21 @@ void VuelcaCACHE(T_LINEA_CACHE *tbl){
 		printf("\n");
 	}
 }
+/*---------------------------------------------------------------------------------------------------------------------*/
+void tratarFallo(CACHE_LINE *tbl, char *MRAM, int ETQ,int linea, int bloque, int * direccion_array){
+    numfallos= numfallos + 1;
+    globaltime= globaltime + 10;
+    
+    printf("time: %d, Fallo de CACHE %d, addr %s ETQ %X linea %02X palabra %02X bloque %02X \n", globaltime,numfallos,lineas,direccion_array[0],direccion_array[1],direccion_array[2],direccion_array[3]);
+
+    printf("Cargando el bloque %02X en la linea %02X \n",direccion_array[3],direccion_array[1]);
+    CACHE_LINE[direccion_array[1]].ETQ=direccion_array[0];//Cargamos la nueva etiqueta
+    
+    //Extración del texto
+    for(int i=0;i<TAM_LINEA;i++){
+        CACHE_LINE[direccion_array[1]].Data[i] = Simul_RAM[direccion_array[3]+TAM_LINEA*i];
+    }
+
 
 //LEER FICHERO ---------------------------------------------------------------------------------------------------------------------------
 void leerBinario(){
@@ -146,3 +161,44 @@ int escritura_en_fichero_binario(){
 	
 	
 }
+
+//Lee el fichero accesos_memoria.txt
+int Lectura_fichero(){
+    int n;
+    FILE * fichero;
+    //abre fichero de lectura
+    fichero = fopen("accesos_memoria.txt", "r");
+    int direccion_cortada [4];
+    int * direccion_array;
+
+    if(fichero != NULL){
+        char lineas [5];
+
+        //Metodo para recorrer el fichero y almacenar el contenido en "lineas"
+        while(fgets(lineas,sizeof(lineas),fichero)!=NULL){
+            globaltime++;
+            direccion_array=binarioConversion(direccion_cortada,lineas);
+            //Eliminar el buffer
+            lineas[strcspn(lineas, "\n")] = 0;
+            //comparar las etiquetas para ver si son iguales y si no tratar el fallo
+            if(comparar_Etiqueta(direccion_array[0],direccion_array[1])){
+                
+                printf("tiempo: %d, Acierto %d, addr %s ETQ %X linea %02X palabra %02X dato %02X \n", globaltime,accesostotales-numfallos+1,lineas,direccion_array[0],direccion_array[1],direccion_array[2],CACHE_LINE[direccion_array[1]].Data[direccion_array[2]]);
+            }else{
+                tratarFallo(direccion_array,lineas);
+            }
+            //registro de acceso
+            texto[accesostotales]=CACHE_LINE[direccion_array[1]].Data[direccion_array[2]];
+            accesostotales++;
+            sleep(1);
+        }
+
+    }else{
+        //Caso error
+        printf("ERROR EN EL ARCHIVO SELECCIONADO");
+        exit(-1);
+    }
+    return 0;
+}
+
+
