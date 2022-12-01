@@ -14,7 +14,7 @@
 #define TAM_LINEA 8
 #define LRAM 1024
 
-//ESTRUCTURA ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//ESTRUCTURA LINEAS CACHE -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 typedef struct {
 	
 	unsigned short int ETQ;
@@ -32,7 +32,9 @@ int cambioHexadecimalADecimal(long long numero );
 int escritura_en_fichero_binario();
 void leerBinario();
 int lectura_del_fichero_de_memoria();
-void leer_fichero();
+void leer_fichero_contents_RAM();
+
+bool comparar_etiqueta(int etiqueta, int linea);
 
 //VARIABLES GLOBALES -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	int globaltime = 0;
@@ -51,7 +53,7 @@ int main(int argc, char* argv[]){
 	LimpiaCACHE(linea_cache);
 	
 	//Leemos el fichero Binario
-	leer_fichero();
+	leer_fichero_contents_RAM();
 	
 	//Lectura fichero de memoria
 	lectura_del_fichero_de_memoria();
@@ -118,7 +120,26 @@ void VuelcaCACHE(T_LINEA_CACHE *tbl){
 		printf("\n");
 	}
 }
-/*---------------------------------------------------------------------------------------------------------------------*/
+
+//FUNCION LEER FICHERO CONTENTS RAM ----------------------------------------------------------------------------------------
+void leer_fichero_contents_RAM(){
+	
+	FILE* fichero_bin;
+	
+	//Abrir el fichero en modo de lectura ("rb", (READ BINARY))
+	fichero_bin = fopen("CONTENTS_RAM.bin", "rb");
+	
+	if(fichero_bin != NULL){
+		//Leemos fichero y lo cargamos
+		fread(SIMUL_RAM	, sizeof(Simul_RAM), 1, fichero_bin);
+	
+	}else{
+		printf("El archivo no existe!!");
+		exit(-1);
+	}
+}
+
+//FUNCION TRATAR FALLO --------------------------------------------------------------------------------------------------*/
 void tratarFallo(CACHE_LINE *tbl, char *MRAM, int ETQ,int linea, int bloque, int * direccion_array){
     numfallos= numfallos + 1;
     globaltime= globaltime + 10;
@@ -135,6 +156,7 @@ void tratarFallo(CACHE_LINE *tbl, char *MRAM, int ETQ,int linea, int bloque, int
 
 
 //LEER FICHERO ---------------------------------------------------------------------------------------------------------------------------
+//Comprueba que el fichero se ha escrito todo bien y como debe de ser.
 void leerBinario(){
 	
 	FILE * fichero;
@@ -156,14 +178,50 @@ void leerBinario(){
     }
 }
 
-//ESCRIBIR EN FICHERO
-int escritura_en_fichero_binario(){
+//Comprobar la etiqueta ----------------------------------------------------------------------------------------------------------------
+
+bool comparar_etiqueta(int etiqueta, int linea){
 	
-	
+	 if((int)cacheLine[linea].ETQ==etiqueta){
+        return true;
+    }else{
+        return false;
+    }
 }
 
-//Lee el fichero accesos_memoria.txt
-int Lectura_fichero(){
+
+//ESCRIBIR EN FICHERO ------------------------------------------------------------------------------------------------------
+int escritura_en_fichero_binario(){
+	
+	FILE * fichero2;
+    //Buffer con la información para escribir
+    char wbuffer[256];
+    int cont=0;
+
+    //Abrir fichero modo escritura ("w+b" write binary, en caso de no existir lo crea y si existe lo crea de nuevo)
+    fichero2 = fopen("CONTENS_CACHE.bin", "w+b");
+    
+    if (fichero2==NULL){
+        perror("No se puede abrir CONTENS_CACHE.bin");
+        return -1;
+    }else{
+        //Recorremos cacheLine[x].data y extraemos su contenido y lo almacenamos en el buffer 
+        for(int i=0;i<16;i++){
+            for(int j=0;j<TAM_LINEA;j++){
+                wbuffer[cont]=cacheLine[i].Data[j];
+                cont++;
+            }
+        }
+
+        //Escribe el contenido en el archivo
+        for (int k = 0; k < 256; k++){
+            fwrite(wbuffer, sizeof(wbuffer),1,fichero2);
+        }
+    }
+}
+
+//Lee el fichero accesos_memoria.txt ---------------------------------------------------------------------------------------------------------------------------
+int lectura_del_fichero_de_memoria(){
     int n;
     FILE * fichero;
     //abre fichero de lectura
