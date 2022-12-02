@@ -1,0 +1,34 @@
+T: 11, Fallo de CACHE 1, ADDR 22E Label 4 linea 02 palabra 0E bloque 22 
+Cargando el bloque 22 en la linea 02 
+T: 22, Fallo de CACHE 2, ADDR 434 Label 8 linea 03 palabra 04 bloque 43 
+Cargando el bloque 43 en la linea 03 
+tiempo: 23, Acierto 1, addr 430 ETQ 8 linea 03 palabra 00 dato 64 
+T: 34, Fallo de CACHE 3, ADDR 598 Label B linea 01 palabra 08 bloque 59 
+Cargando el bloque 59 en la linea 01 
+tiempo: 35, Acierto 2, addr 595 ETQ B linea 01 palabra 05 dato 6E 
+tiempo: 36, Acierto 3, addr 596 ETQ B linea 01 palabra 06 dato 74 
+T: 47, Fallo de CACHE 4, ADDR C77 Label 18 linea 07 palabra 07 bloque C7 
+Cargando el bloque C7 en la linea 07 
+T: 58, Fallo de CACHE 5, ADDR B09 Label 16 linea 00 palabra 09 bloque B0 
+Cargando el bloque B0 en la linea 00 
+T: 69, Fallo de CACHE 6, ADDR 63A Label C linea 03 palabra 0A bloque 63 
+Cargando el bloque 63 en la linea 03 
+T: 80, Fallo de CACHE 7, ADDR FC4 Label 1F linea 04 palabra 04 bloque FC 
+Cargando el bloque FC en la linea 04 
+T: 91, Fallo de CACHE 8, ADDR 81C Label 10 linea 01 palabra 0C bloque 81 
+Cargando el bloque 81 en la linea 01 
+tiempo: 92, Acierto 4, addr FC0 ETQ 1F linea 04 palabra 00 dato 6E 
+T: 103, Fallo de CACHE 9, ADDR 062 Label 0 linea 06 palabra 02 bloque 06 
+Cargando el bloque 06 en la linea 06 
+tiempo: 104, Acierto 5, addr FC6 ETQ 1F linea 04 palabra 06 dato 61 
+ETQ: 16  Data 65 50 6E 62 6C 68 72 2C 
+ETQ: 10  Data 6E 74 64 69 65 6E 73 61 
+ETQ: 04  Data 43 2C 74 72 20 61 20 75 
+ETQ: 0C  Data 75 65 6E 20 74 62 63 69 
+ETQ: 1F  Data 6E 6E 68 6D 69 65 61 75 
+ETQ: FF  Data 23 23 23 23 23 23 23 23 
+ETQ: 00  Data 2E 71 65 72 6C 74 6E 71 
+ETQ: 18  Data 72 69 69 6F 69 20 75 75 
+
+Accesos totales: 14; Fallos: 9; Tiempo medio: 3.190000 
+Texto leido: #udntu

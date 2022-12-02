@@ -25,9 +25,16 @@ typedef struct {
 //PROTOTIPOS DE LAS FUNCIONES -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void LimpiaCACHE(T_LINEA_CACHE tbl[NUM_FILAS]);
 void VuelcaCACHE(T_LINEA_CACHE *tbl);
-void Parseaaddr(unsigned int addr, int *ETQ, int *palabra, int *linea, int *bloque);
-void TrataFallo(T_LINEA_CACHE *tbl, char *MRAM, int ETQ, int linea, int bloque);
+//void ParsearDireccion(unsigned int addr, int *ETQ, int *palabra, int *linea, int *bloque);
+
+void parsearDireccion(char binario [],int direccion_cortada []);
+
+//void TrataFallo(T_LINEA_CACHE *tbl, char *MRAM, int ETQ,int linea, int bloque, int * direccion_array);
+
+void tratarFallo(int * arraydireccion,char lineas []);
+
 int cambioHexadecimalADecimal(long long numero );
+int *binarioConversion(int *Dir_acortada, char linea []);
 
 int escritura_en_fichero_binario();
 void leerBinario();
@@ -131,29 +138,46 @@ void leer_fichero_contents_RAM(){
 	
 	if(fichero_bin != NULL){
 		//Leemos fichero y lo cargamos
-		fread(SIMUL_RAM	, sizeof(Simul_RAM), 1, fichero_bin);
-	
+		fread(Simul_RAM, sizeof(Simul_RAM), 1, fichero_bin);
 	}else{
-		printf("El archivo no existe!!");
+		printf("El archivo no ha sido posible de abrirse!!");
 		exit(-1);
 	}
 }
 
 //FUNCION TRATAR FALLO --------------------------------------------------------------------------------------------------*/
-void tratarFallo(CACHE_LINE *tbl, char *MRAM, int ETQ,int linea, int bloque, int * direccion_array){
+/*
+void TrataFallo(T_LINEA_CACHE *tbl, char *MRAM, int ETQ,int linea, int bloque, int * direccion_array){
     numfallos= numfallos + 1;
     globaltime= globaltime + 10;
     
-    printf("time: %d, Fallo de CACHE %d, addr %s ETQ %X linea %02X palabra %02X bloque %02X \n", globaltime,numfallos,lineas,direccion_array[0],direccion_array[1],direccion_array[2],direccion_array[3]);
+    printf("time: %d, Fallo de CACHE %d, addr %04X Label %X linea %02X palabra %02X DATO %02X \n", globaltime,numfallos, linea,direccion_array[0],direccion_array[1],direccion_array[2],direccion_array[3]);
 
     printf("Cargando el bloque %02X en la linea %02X \n",direccion_array[3],direccion_array[1]);
-    CACHE_LINE[direccion_array[1]].ETQ=direccion_array[0];//Cargamos la nueva etiqueta
+	//Cargamos la nueva etiqueta
+    linea_cache[direccion_array[1]].ETQ=direccion_array[0];
     
     //Extración del texto
     for(int i=0;i<TAM_LINEA;i++){
-        CACHE_LINE[direccion_array[1]].Data[i] = Simul_RAM[direccion_array[3]+TAM_LINEA*i];
+        linea_cache[direccion_array[1]].Datos[i] = Simul_RAM[direccion_array[3]+TAM_LINEA*i];
     }
 
+*/
+
+void tratarFallo(int * arraydireccion,char lineas []){
+    numfallos+=1;
+    globaltime+=10;
+    
+    printf("T: %d, Fallo de CACHE %d, ADDR %s Label %X linea %02X palabra %02X bloque %02X \n", globaltime,numfallos,lineas,arraydireccion[0],arraydireccion[1],arraydireccion[2],arraydireccion[3]);
+
+    printf("Cargando el bloque %02X en la linea %02X \n",arraydireccion[3],arraydireccion[1]);
+    linea_cache[arraydireccion[1]].ETQ=arraydireccion[0];//Cargamos la nueva etiqueta
+    
+    //Extración del texto
+    for(int i=0;i<TAM_LINEA;i++){
+        linea_cache[arraydireccion[1]].Datos[i] = Simul_RAM[arraydireccion[3]+TAM_LINEA*i];
+    }
+}
 
 //LEER FICHERO ---------------------------------------------------------------------------------------------------------------------------
 //Comprueba que el fichero se ha escrito todo bien y como debe de ser.
@@ -182,7 +206,7 @@ void leerBinario(){
 
 bool comparar_etiqueta(int etiqueta, int linea){
 	
-	 if((int)cacheLine[linea].ETQ==etiqueta){
+	 if((int)linea_cache[linea].ETQ==etiqueta){
         return true;
     }else{
         return false;
@@ -191,8 +215,9 @@ bool comparar_etiqueta(int etiqueta, int linea){
 
 // FUNCION CONVERSION A BINARIO
 
-int *convertirBinario(int *Dir_acortada, char linea []){
+int *binarioConversion(int *Dir_acortada, char linea []){
     char num_binario[100];
+	int palabra;
     num_binario[0]='\0'; //poner el string a 0 y borrar lo que tenia dentro
 
     for (int i = 0; i < 3; ++i){   
@@ -256,10 +281,45 @@ int *convertirBinario(int *Dir_acortada, char linea []){
     }
 
     // ahora toca parsear la direccion
-    parsearDireccion(num_binario,Dir_acortada);
+   // ParsearDireccion((int)Dir_acortada, &ETQ, &palabra, &linea, &bloque);
 
+	parsearDireccion(num_binario,Dir_acortada);
+	
     return Dir_acortada;
 }
+//void ParsearDireccion(unsigned int addr, int *ETQ, int *palabra, int *linea, int *bloque)
+//PARSEAR LAS DIRECCIONES --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/*
+void ParsearDireccion(unsigned int addr, int *ETQ, int *palabra, int *linea, int *bloque){
+	*ETQ=addr >> 7;
+	*linea=(addr & 0b1110000) >> 4;
+	*palabra = addr & 0b1111;
+	*bloque = addr >> 4;
+}
+*/
+
+void parsearDireccion(char num_binario [],int Dir_acortada []){
+
+  char etiqueta[50];
+    memcpy(etiqueta,&num_binario[0],5);
+    int etiq = atoi(etiqueta);
+    Dir_acortada[0]=cambioHexadecimalADecimal(etiq);
+
+    char lineaaa[50];
+    memcpy(lineaaa,&num_binario[5],3);
+    int linea2 = atoi(lineaaa);
+    Dir_acortada[1]=cambioHexadecimalADecimal(linea2);
+
+    char palabra[50];
+    memcpy(palabra,&num_binario[8],4);
+    int palabra2 = atoi(palabra);
+    Dir_acortada[2]=cambioHexadecimalADecimal(palabra2);
+   
+    char bloque[150];
+    memcpy(bloque,&num_binario[0],8);
+    int bloque2 = atoi(bloque);
+    Dir_acortada[3]=cambioHexadecimalADecimal(bloque2);
+}	
 
 //ESCRIBIR EN FICHERO ------------------------------------------------------------------------------------------------------
 int escritura_en_fichero_binario(){
@@ -279,7 +339,7 @@ int escritura_en_fichero_binario(){
         //Recorremos cacheLine[x].data y extraemos su contenido y lo almacenamos en el buffer 
         for(int i=0;i<16;i++){
             for(int j=0;j<TAM_LINEA;j++){
-                wbuffer[cont]=cacheLine[i].Data[j];
+                wbuffer[cont]=linea_cache[i].Datos[j];
                 cont++;
             }
         }
@@ -293,7 +353,7 @@ int escritura_en_fichero_binario(){
 
 //Lee el fichero accesos_memoria.txt ---------------------------------------------------------------------------------------------------------------------------
 int lectura_del_fichero_de_memoria(){
-    int n;
+  
     FILE * fichero;
     //abre fichero de lectura
     fichero = fopen("accesos_memoria.txt", "r");
@@ -301,24 +361,27 @@ int lectura_del_fichero_de_memoria(){
     int * direccion_array;
 
     if(fichero != NULL){
-        char lineas [5];
+        char linea [5];
 
         //Metodo para recorrer el fichero y almacenar el contenido en "lineas"
-        while(fgets(lineas,sizeof(lineas),fichero)!=NULL){
+        while(fgets(linea,sizeof(linea),fichero)!=NULL){
             globaltime++;
-            direccion_array=binarioConversion(direccion_cortada,lineas);
+            direccion_array=binarioConversion(direccion_cortada,linea);
             //Eliminar el buffer
-            lineas[strcspn(lineas, "\n")] = 0;
+            linea[strcspn(linea, "\n")] = 0;
             //comparar las etiquetas para ver si son iguales y si no tratar el fallo
-            if(comparar_Etiqueta(direccion_array[0],direccion_array[1])){
+            if(comparar_etiqueta(direccion_array[0],direccion_array[1])){
                 
-                printf("tiempo: %d, Acierto %d, addr %s ETQ %X linea %02X palabra %02X dato %02X \n", globaltime,accesostotales-numfallos+1,lineas,direccion_array[0],direccion_array[1],direccion_array[2],CACHE_LINE[direccion_array[1]].Data[direccion_array[2]]);
+                printf("tiempo: %d, Acierto %d, addr %s ETQ %X linea %02X palabra %02X dato %02X \n", globaltime,numeroAccesosTotales-numfallos+1,linea,direccion_array[0],direccion_array[1],direccion_array[2],linea_cache[direccion_array[1]].Datos[direccion_array[2]]);
             }else{
-                tratarFallo(direccion_array,lineas);
+				//TrataFallo(T_LINEA_CACHE *tbl, char *MRAM, int ETQ,int linea, int bloque, int * direccion_array)
+                //(LA QUE ESTABA ANTES) TrataFallo(direccion_array,linea,Simul_RAM, label,bloque);
+				//TrataFallo(&tbl,&MRAM,ETQ,linea,bloque,direccion_array);
+				tratarFallo(direccion_array,linea);
             }
             //registro de acceso
-            texto[accesostotales]=CACHE_LINE[direccion_array[1]].Data[direccion_array[2]];
-            accesostotales++;
+            fichero_texto[numeroAccesosTotales]=linea_cache[direccion_array[1]].Datos[direccion_array[2]];
+            numeroAccesosTotales++;
             sleep(1);
         }
 
